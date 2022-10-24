@@ -3,6 +3,7 @@ use fast_hilbert::{h2xy};
 
 type Error = Box<dyn std::error::Error>;
 
+use flatbuffers::FlatBufferBuilder;
 use memmap2::{Mmap, MmapMut};
 
 #[allow(dead_code, unused_imports)]
@@ -40,6 +41,7 @@ fn run() -> Result<(), Error> {
         points[12] = point;
     };
 
+
     // fill up the entire buffer
     let slc = &mut mmap[..];
     unsafe {
@@ -51,7 +53,33 @@ fn run() -> Result<(), Error> {
         }
     };
 
+
     // Make a simple point table
+    let mut builder = FlatBufferBuilder::new();
+    let mut point_table_builder = PointTableBuilder::new(&mut builder);
+    // push h value on slotoff: 4
+    // field_locs [{off: 8, id:4}] 64bits, slot offset 4
+    point_table_builder.add_h(h);
+    // field_locs [{off: 8, id:4}, {off: 12, id:6}] 32bits, slot offset 6
+    point_table_builder.add_x(x);
+    // field_locs [{off: 8, id:4}, {off: 12, id:6}, {off: 16, id:4}] 32bits, slot offset 6
+    point_table_builder.add_y(y);
+    // point_table_builder.finish calls 
+    let point_table = point_table_builder.finish();
+    // builder.finish allocates 24 more bytes to owned_buf, to a total of 64, with head being 24
+    builder.finish(point_table, None);
+    // this is just a slice where head is the start
+    let data = builder.finished_data();
+    // total                - 40 bytes
+    // vtable_start_pos     - 16 bytes (usize)
+    // vtable               -  8 bytes
+    // data_len             -  4 bytes 
+    // data                 - 16 bytes
+    //
+    // vtable_start_pos = size_of_u32 + size_prefix_offset + size_file_identifier
+    // [vtable_start_position  __  __  __  __ , vt_len, objlen, hoffset,xoffset,yoffset,data_len__  __, y_  __  __  __, x_  __  __  __, h_  __  __  __  __  __  __  __]
+    // [14, 00, 00, 00, 00, 00, 00, 00, 00, 00, 0A, 00, 14, 00, 0C, 00, 08, 00, 04, 00, 0A, 00, 00, 00, 03, 00, 00, 00, 03, 00, 00, 00, 0A, 00, 00, 00, 00, 00, 00, 00]
+    println!("point_table {:02X?}", data);
 
     Ok(())
 }
@@ -65,3 +93,50 @@ fn main() {
     }
     
 }
+
+// table at this point is 16 bytes
+// finish will write the vtable
+// push 0xF0F0_F0F0
+
+// 
+
+
+// Comment in write_vtable
+// Layout of the data this function will create when a new vtable is
+// needed.
+// --------------------------------------------------------------------
+// vtable starts here
+// | x, x -- vtable len (bytes) [u16]
+// | x, x -- object inline len (bytes) [u16]
+// | x, x -- zero, or num bytes from start of object to field #0   [u16]
+// | ...
+// | x, x -- zero, or num bytes from start of object to field #n-1 [u16]
+// vtable ends here
+// table starts here
+// | x, x, x, x -- offset (negative direction) to the vtable [i32]
+// |               aka "vtableoffset"
+// | -- table inline data begins here, we don't touch it --
+// table ends here -- aka "table_start"
+// --------------------------------------------------------------------
+//
+// Layout of the data this function will create when we re-use an
+// existing vtable.
+//
+// We always serialize this particular vtable, then compare it to the
+// other vtables we know about to see if there is a duplicate. If there
+// is, then we erase the serialized vtable we just made.
+// We serialize it first so that we are able to do byte-by-byte
+// comparisons with already-serialized vtables. This 1) saves
+// bookkeeping space (we only keep revlocs to existing vtables), 2)
+// allows us to convert to little-endian once, then do
+// fast memcmp comparisons, and 3) by ensuring we are comparing real
+// serialized vtables, we can be more assured that we are doing the
+// comparisons correctly.
+//
+// --------------------------------------------------------------------
+// table starts here
+// | x, x, x, x -- offset (negative direction) to an existing vtable [i32]
+// |               aka "vtableoffset"
+// | -- table inline data begins here, we don't touch it --
+// table starts here: aka "table_start"
+// --------------------------------------------------------------------

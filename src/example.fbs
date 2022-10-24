@@ -10,3 +10,6 @@ table PointTable {
     x: uint32;
     y: uint32;
 }
+
+// Just adds functions that verify a given table is the root
+// root_type PointTable;
