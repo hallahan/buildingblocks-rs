@@ -77,9 +77,13 @@ fn run() -> Result<(), Error> {
     // data                 - 16 bytes
     //
     // vtable_start_pos = size_of_u32 + size_prefix_offset + size_file_identifier
-    // [vtable_start_position  __  __  __  __ , vt_len, objlen, hoffset,xoffset,yoffset,data_len__  __, y_  __  __  __, x_  __  __  __, h_  __  __  __  __  __  __  __]
+    // the 00, 00 is just padding
+    // 20 bytes in is where data_len is. That is the negative offset for the vtable.
+    // [vtable_start_position   __  __  00, 00, vt_len, objlen, hoffset,xoffset,yoffset,data_len__  __, y_  __  __  __, x_  __  __  __, h_  __  __  __  __  __  __  __]
     // [14, 00, 00, 00, 00, 00, 00, 00, 00, 00, 0A, 00, 14, 00, 0C, 00, 08, 00, 04, 00, 0A, 00, 00, 00, 03, 00, 00, 00, 03, 00, 00, 00, 0A, 00, 00, 00, 00, 00, 00, 00]
+    // [20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 20, 0, 12, 0, 8, 0, 4, 0, 10, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0]
     println!("point_table {:02X?}", data);
+    println!("point_table {:?}", data);
 
     Ok(())
 }
