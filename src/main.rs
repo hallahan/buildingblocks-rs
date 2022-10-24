@@ -85,6 +85,42 @@ fn run() -> Result<(), Error> {
     println!("point_table {:02X?}", data);
     println!("point_table {:?}", data);
 
+
+
+    let mut b = FlatBufferBuilder::new();
+
+    // max num_items
+    b.start_vector::<Point>(3);
+
+    let (x, y) = h2xy::<u32>(10);
+    let p0 = Point::new(h, x, y);
+
+    let (x, y) = h2xy::<u32>(11);
+    let p1 = Point::new(h, x, y);
+
+    let (x, y) = h2xy::<u32>(12);
+    let p2 = Point::new(h, x, y);
+
+    b.push(p0);
+    b.push(p1);
+    b.push(p2);
+
+    // num items actually written
+    let point_vector = b.end_vector::<Point>(3);
+
+    // at this point, all of the points are in memory
+
+    let mut feat_b = FeatureBuilder::new(&mut b);
+    feat_b.add_points(point_vector);
+    let feature = feat_b.finish();
+
+
+    b.finish(feature, None);
+    let d = b.finished_data();
+    println!("point_vector {:02X?}", d);
+    println!("point_vector {:?}", d);
+
+
     Ok(())
 }
 

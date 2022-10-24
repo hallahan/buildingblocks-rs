@@ -296,3 +296,100 @@ impl core::fmt::Debug for PointTable<'_> {
       ds.finish()
   }
 }
+pub enum FeatureOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct Feature<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for Feature<'a> {
+  type Inner = Feature<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> Feature<'a> {
+  pub const VT_POINTS: flatbuffers::VOffsetT = 4;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    Feature { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr>,
+    args: &'args FeatureArgs<'args>
+  ) -> flatbuffers::WIPOffset<Feature<'bldr>> {
+    let mut builder = FeatureBuilder::new(_fbb);
+    if let Some(x) = args.points { builder.add_points(x); }
+    builder.finish()
+  }
+
+
+  #[inline]
+  pub fn points(&self) -> Option<flatbuffers::Vector<'a, Point>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, Point>>>(Feature::VT_POINTS, None)}
+  }
+}
+
+impl flatbuffers::Verifiable for Feature<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, Point>>>("points", Self::VT_POINTS, false)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct FeatureArgs<'a> {
+    pub points: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, Point>>>,
+}
+impl<'a> Default for FeatureArgs<'a> {
+  #[inline]
+  fn default() -> Self {
+    FeatureArgs {
+      points: None,
+    }
+  }
+}
+
+pub struct FeatureBuilder<'a: 'b, 'b> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b> FeatureBuilder<'a, 'b> {
+  #[inline]
+  pub fn add_points(&mut self, points: flatbuffers::WIPOffset<flatbuffers::Vector<'b , Point>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(Feature::VT_POINTS, points);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a>) -> FeatureBuilder<'a, 'b> {
+    let start = _fbb.start_table();
+    FeatureBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<Feature<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for Feature<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("Feature");
+      ds.field("points", &self.points());
+      ds.finish()
+  }
+}

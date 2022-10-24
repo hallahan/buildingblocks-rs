@@ -11,5 +11,9 @@ table PointTable {
     y: uint32;
 }
 
+table Feature {
+    points: [Point];
+}
+
 // Just adds functions that verify a given table is the root
 // root_type PointTable;
