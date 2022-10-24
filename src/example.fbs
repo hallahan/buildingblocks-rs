@@ -1,0 +1,12 @@
+
+struct Point {
+    h: uint64;
+    x: uint32;
+    y: uint32;
+}
+
+table PointTable {
+    h: uint64;
+    x: uint32;
+    y: uint32;
+}
