@@ -1,13 +1,13 @@
-use std::{fs::{File, OpenOptions}, mem::size_of};
-use fast_hilbert::{h2xy};
+use std::{fs::OpenOptions, mem::size_of};
+use fast_hilbert::h2xy;
 
 type Error = Box<dyn std::error::Error>;
 
 use flatbuffers::FlatBufferBuilder;
-use memmap2::{Mmap, MmapMut};
+use memmap2::MmapMut;
 
 #[allow(dead_code, unused_imports)]
-#[path = "./example_generated.rs"]
+#[path = "../src/example_generated.rs"]
 pub mod example;
 use example::*;
 
@@ -120,7 +120,6 @@ fn run() -> Result<(), Error> {
     println!("point_vector {:02X?}", d);
     println!("point_vector {:?}", d);
 
-
     Ok(())
 }
 
@@ -137,8 +136,6 @@ fn main() {
 // table at this point is 16 bytes
 // finish will write the vtable
 // push 0xF0F0_F0F0
-
-// 
 
 
 // Comment in write_vtable
