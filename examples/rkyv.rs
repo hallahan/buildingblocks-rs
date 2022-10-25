@@ -1,7 +1,8 @@
 type Error = Box<dyn std::error::Error>;
 
-use std::pin::Pin;
+use std::{pin::Pin, fs::OpenOptions};
 
+use memmap2::MmapMut;
 use rkyv::{Archive, Deserialize, Serialize};
 // bytecheck can be used to validate your data if you want
 // use bytecheck::CheckBytes;
@@ -15,6 +16,15 @@ struct Test {
     int: u8,
     string: String,
     option: Option<Vec<i32>>,
+}
+
+#[derive(Archive, Deserialize, Serialize, Debug, PartialEq)]
+#[archive(compare(PartialEq))]
+#[archive_attr(derive(Debug))]
+struct Point {
+    h: u64,
+    x: u32,
+    y: u32
 }
 
 
@@ -45,6 +55,27 @@ fn run() -> Result<(), Error> {
         a.int = 255;
         println!("mutate {:?}", a);
     }
+
+    // Mutate a memmap buffer
+    let file = OpenOptions::new().read(true).write(true).create(true).open("data/rkyv_points")?;
+    file.set_len(1600_u64)?;
+    let mut mmap = unsafe { MmapMut::map_mut(&file)? };
+    let slc: &mut [u8] = &mut mmap[..];
+    let p = Pin::<&mut [u8]>::new(slc);
+    let a = unsafe { rkyv::archived_root_mut::<Point>(p) };
+    unsafe {
+        let ap = a.get_unchecked_mut();
+        ap.h = 11;
+        ap.x = 12;
+        ap.y = 13;
+
+        println!("rkyv_points {:?}", ap);
+        println!("rkyv_points hex {:02X?}", ap);
+    }
+
+    // Make a BTree
+
+
 
     Ok(())
 } 
