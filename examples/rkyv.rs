@@ -3,7 +3,7 @@ type Error = Box<dyn std::error::Error>;
 use std::{pin::Pin, fs::OpenOptions, io::Write, collections::BTreeMap};
 
 use memmap2::MmapMut;
-use rkyv::{Archive, Deserialize, Serialize};
+use rkyv::{AlignedBytes, Archive, Deserialize, Serialize, collections::ArchivedBTreeMap, ser::serializers::{AllocSerializer, BufferSerializer}};
 // bytecheck can be used to validate your data if you want
 // use bytecheck::CheckBytes;
 
@@ -26,6 +26,14 @@ struct Point {
     x: u32,
     y: u32
 }
+
+// type MyVec<'a> = Vec<(&'a u16, &'a u16)>;
+
+// impl ExactSizeIterator for MyVec<'a> {
+//     fn len(&self) -> usize {
+//         self.len()
+//     }
+// }
 
 
 fn run() -> Result<(), Error> {
@@ -108,6 +116,24 @@ fn run() -> Result<(), Error> {
         assert_eq!(k.parse::<usize>().unwrap(), *v as usize);
     }
 
+
+
+
+    // let vec: Vec<(&u16, &u16)> = vec![(&3210, &1), (&3100, &2), (&1000, &3), (&700, &4), (&55, &5), (&22, &2)];
+
+    // let input = OpenOptions::new().read(true).write(true).open("btree_ex").unwrap();
+    // let mut mmap = unsafe { memmap2::MmapMut::map_mut(&input).unwrap() };
+    // let u8_arr = mmap.as_mut();
+    
+    
+    // let mut ser = AllocSerializer::<1024>::default();
+    // unsafe {
+    //      let _resolver = ArchivedBTreeMap::serialize_from_reverse_iter(vec.into_iter(), &mut ser)?;
+    //      let aligned_vec = ser.into_serializer().into_inner();
+    // };
+    
+
+    
 
     Ok(())
 } 
