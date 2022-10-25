@@ -9,4 +9,4 @@ edition = "2021"
 fast_hilbert = "1.0.1"
 flatbuffers = "22.9.29"
 memmap2 = "0.5.7"
-rkyv = "0.7.39"
+rkyv = { version = "0.7", features = ["validation"] }
