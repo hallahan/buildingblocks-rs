@@ -1,0 +1,138 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'flatbuffers'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=flatbuffers",
+                    "--package=buildingblocks-rs"
+                ],
+                "filter": {
+                    "name": "flatbuffers",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'flatbuffers'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=flatbuffers",
+                    "--package=buildingblocks-rs"
+                ],
+                "filter": {
+                    "name": "flatbuffers",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'hello'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=hello",
+                    "--package=buildingblocks-rs"
+                ],
+                "filter": {
+                    "name": "hello",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'time'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=time",
+                    "--package=buildingblocks-rs"
+                ],
+                "filter": {
+                    "name": "time",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'hello'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=hello",
+                    "--package=buildingblocks-rs"
+                ],
+                "filter": {
+                    "name": "hello",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'rkyv'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=rkyv",
+                    "--package=buildingblocks-rs"
+                ],
+                "filter": {
+                    "name": "rkyv",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'rkyv'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=rkyv",
+                    "--package=buildingblocks-rs"
+                ],
+                "filter": {
+                    "name": "rkyv",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
